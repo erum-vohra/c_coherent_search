@@ -4,7 +4,7 @@ import os
 import argparse
 import numpy as np
 import coherent_search.utils as utils
-import coherent_search.fourierinterp as fi
+import coherent_search.fourierinterp_ctypes as fi
 from tqdm import tqdm
 
 
@@ -101,7 +101,7 @@ If no output candidate file name is given, the results will be written to stdout
     # Prep the FouierInterpolator class instances
     fis = {}
     for ii in range(1, args.nharms + 1):
-        fis[ii] = fi.FourierInterpolator(
+        fis[ii] = utils.FourierInterpolator(
             ft, args.lobin * ii, args.numbetween, m, args.fftlen, coeffs
         )
 
