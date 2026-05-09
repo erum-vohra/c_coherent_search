@@ -158,3 +158,18 @@ def test_fourier_interp():
     v2 = finterp_FFT(12400, 1, len(rs), ft, m)
     np.testing.assert_allclose(v1.real, v2.real, rtol=1e-5, atol=1e-7)
     np.testing.assert_allclose(v1.imag, v2.imag, rtol=1e-5, atol=1e-7)
+
+
+if __name__ == "__main__":
+    print("Running tests...")
+
+    test_get_finterp_coeffs()
+    print("test_get_finterp_coeffs passed!")
+
+    test_get_nearby_fourier_bins()
+    print("test_get_nearby_fourier_bins passed!")
+
+    test_fourier_interp()
+    print("test_fourier_interp passed!")
+
+    print("All tests passed.")

@@ -27,4 +27,4 @@ void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len
 void get_finterp_FFT_coeffs(int numbetween, int m, int fftlen, cplex *coeffs);
 
 /* perform Fourier interpolation for many frequencies using FFT correlation */
-void finterp_FFT(int lobin, int numbins, int numbetween, const cplex *ft, int64_t ft_len, int m, const cplex *e_coeffs, cplex *out);
+void finterp_FFT(int lobin, int numbins, int numbetween, const cplex_f *ft, int64_t ft_len, int m, const cplex *e_coeffs, cplex *out);
