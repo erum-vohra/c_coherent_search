@@ -1,12 +1,12 @@
 # %%
 import timeit
 import numpy as np
-import coherent_search.utils as utils
-import coherent_search.fourierinterp as fi
+import src.utils as utils
+import src.fourierinterp_ctypes as fi
 import matplotlib.pyplot as plt
 
 # This file has a 10Hz pulsar signal in it
-ft = utils.fftfile("harmonics_hi.fft")
+ft = utils.fftfile("./examples/harmonics_hi.fft")
 
 psrf = 10.0  # Hz
 psrr = psrf * ft.T
@@ -17,7 +17,7 @@ numbetween = 20  # Number of points to interpolate between Fourier bins
 drs = np.arange(numbetween) / numbetween
 multicoeffs = fi.get_finterp_multi_coeffs(drs, m)
 
-minfftlen = utils.next_pow_of_2((m + 1) * numbetween)
+minfftlen = fi.next_pow_of_2((m + 1) * numbetween)
 maxfftlen = 2**18
 fftlens = [2**n for n in range(minfftlen.bit_length(), maxfftlen.bit_length())]
 

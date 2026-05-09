@@ -1,11 +1,11 @@
 # %%
 import numpy as np
-import coherent_search.utils as utils
-import coherent_search.fourierinterp as fi
+import src.utils as utils
+import src.fourierinterp_ctypes as fi
 import matplotlib.pyplot as plt
 
 # This file has a 10.01234...Hz pulsar signal in it
-ft = utils.fftfile("harmonics_hi.fft")
+ft = utils.fftfile("./examples/harmonics_hi.fft")
 
 psrf = 10.0123456789123  # Hz
 psrr = psrf * ft.T
@@ -31,6 +31,7 @@ amps = fi.finterp_FFT(int(np.floor(psrr)) + offs, numbins, numbetween, ft.amps, 
 plt.plot(rs - 10000, np.abs(amps) ** 2)
 plt.xlabel("Fourier frequency (bins)")
 plt.ylabel("Raw Power")
+plt.savefig("raw_power.png")
 plt.show()
 
 # %%

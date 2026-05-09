@@ -3,8 +3,8 @@ import sys
 import os
 import argparse
 import numpy as np
-import csearch.utils as utils
-import csearch.fourierinterp_ctypes as fi
+import src.utils as utils
+import src.fourierinterp_ctypes as fi
 from tqdm import tqdm
 
 

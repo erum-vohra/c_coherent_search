@@ -1,11 +1,11 @@
 # %%
 import numpy as np
-import coherent_search.utils as utils
-import coherent_search.fourierinterp as fi
+import src.utils as utils
+import src.fourierinterp_ctypes as fi
 import matplotlib.pyplot as plt
 
 # This file has a 10.0123456789123 Hz pulsar signal in it
-ft = utils.fftfile("harmonics_hi_red.fft")
+ft = utils.fftfile("./examples/harmonics_hi_red.fft")
 
 psrf = 10.0123456789123  # Hz
 psrr = psrf * ft.T
@@ -47,6 +47,7 @@ maxmetric = np.max(profs, axis=1)
 plt.plot(lors - 10000, maxmetric)
 plt.xlabel("Fourier Frequency - 10000 (bins)")
 plt.ylabel("Max Profile Value")
+plt.savefig("fourier_freq.png")
 plt.show()
 
 # %%
@@ -57,6 +58,7 @@ print(f"Best profile is at index {np.argmax(maxmetric)}, should be {psrindex}")
 plt.plot(profs[np.argmax(maxmetric)])
 plt.xlabel("Profile Bin")
 plt.ylabel("Intensity")
+plt.savefig("intensity.png")
 plt.show()
 
 # %%
