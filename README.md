@@ -1,7 +1,7 @@
 # Coherent Search (in C!)
 
 This program implements coherent search for pulsars in C, based on the Python implemetation found at https://github.com/scottransom/coherent_search/.
-The equations this project is based on can be found in [Ransom, Eikenberry, and Middleditch (2002)]{https://arxiv.org/pdf/astro-ph/0204349}. Several filetypes in this project are types used in [PRESTO]{https://github.com/scottransom/presto}, a pulsar analysis toolkit.
+The equations this project is based on can be found in [Ransom, Eikenberry, and Middleditch (2002)](https://arxiv.org/pdf/astro-ph/0204349). Several filetypes in this project are types used in [PRESTO](https://github.com/scottransom/presto), a pulsar analysis toolkit.
 
 The goal of this repository is to quickly do complex Fourier interpolation and use that to perform coherent harmonic summing pulsation searches of FFT to look for pulsar candidates.
 
