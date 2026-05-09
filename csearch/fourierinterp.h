@@ -21,7 +21,7 @@ cplex fourier_interp(double r, const cplex_f *ft, int64_t ft_len, int m);
 void get_finterp_multi_coeffs(const double *rs, int n_rs, int m, cplex *coeffs);
 
 /* perform Fourier interpolation at multiple real-valued Fourier frequencies */
-void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len, int m, const cplex *e_coeffs, cpelx *out);
+void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len, int m, const cplex *e_coeffs, cplex *out);
 
 /* compute Fourier interpolation coeffs for FFT correlation method */
 void get_finterp_FFT_coeffs(int numbetween, int m, int fftlen, cplex *coeffs);
