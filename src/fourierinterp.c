@@ -92,22 +92,127 @@ void get_finterp_multi_coeffs(const double *rs, int n_rs, int m, cplex *coeffs) 
 }
 
 /* perform Fourier interpolation at multiple real-valued Fourier frequencies */
-/* parameters: rs (real valued Fourier frequencies to interpolate), n_rs (length of rs), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), coeffs (precomputed Fourier interpolation coeffs for rs and m) */
-/* return: coeffs (interpolated Fourier amplitudes at frequencies rs) */
-void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len, int m, const cplex *coeffs, cpelx *out) {
-    
+/* parameters: rs (real valued Fourier frequencies to interpolate), n_rs (length of rs), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), e_coeffs (precomputed Fourier interpolation coeffs for rs and m) */
+/* return: out (interpolated Fourier amplitudes at frequencies rs) */
+void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len, int m, const cplex *e_coeffs, cpelx *out) {
+    cplex *bins = malloc(m * sizeof(cplex));
+    cplex *coeffs = NULL;
+
+    if (e_coeffs != NULL) {
+        coeffs = (cplex*)(e_coeffs);
+        int free_coeffs = 0;
+    } else {
+        coeffs = malloc((size_t)n_rs * m * sizeof(cplex));
+        int free_coeffs = 1;
+        get_finterp_multi_coeffs(rs, n_rs, m, coeffs);
+    }
+
+    get_nearby_fourier_bins(rs[0], ft, ft_len, m, bins);
+
+    for (int ii; ii < n_rs; ii++) {
+        cplex result = 0.0 + 0.0 * I;
+        const cplex *row = coeffs + ii * m;
+        for (int jj; jj < m; jj++)
+            result += conj(row[jj]) * bins[jj];
+        out[ii] = result;
+    }
+
+    free(bins);
+    if (free_coeffs) free(coeffs);
 }
 
 /* compute Fourier interpolation coeffs for FFT correlation method */
 /* parameters: numbetween (number of interpolated points between each FFT bin),  m (number of interpolation coeffs), fftlen (length of FFT to use) */
 /* return: coeffs (FFT's Fourier interpolation coefficents) */
 void get_finterp_FFT_coeffs(int numbetween, int m, int fftlen, cplex *coeffs) {
+    assert(m % 2 == 0);
+    assert(fftlen >= numbetween * m);
+    assert(fftlen == next_pow_of_2(fftlen));
+
+    int h_len = numbetween * (m / 2);
+    fftw_complex *tmp = fftw_alloc_complex(fftlen);
+    memset(tmp, 0, fftlen * sizeof(fftw_complex));
+
+    for (int ii = 0; ii < h_len; ii++) {
+        double offset = ii * (1.0 / numbetween);
+        double re = sinc(offset) * cos(-M_PI * offset);
+        double im = sinc(offset) * sin(-M_PI * offset);
+        ((double*)tmp)[2 * ii] = re;
+        ((double*)tmp)[(2 * ii) + 1] = im;
+    }
+
+    for (int ii = 0; ii < h_len; ii++) {
+        double offset = -((h_len - 1 - ii) * (1.0 / numbetween) + (1.0 / numbetween));
+        double re = sinc(offset) * cos(-M_PI * offset);
+        double im = sinc(offset) * sin(-M_PI * offset);     
+        int idx = fftlen - h_len * ii;
+        ((double*)tmp)[2 * dst] = re;
+        ((double*)tmp)[(2 * dst) + 1] = im;       
+    }
+
+    fftw_plan plan = fftw_plan_dft_1d(fftlen, tmp, tmp, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_execute(plan);
+    fftw_destroy_plan(plan);
+
+    for (int ii = 0; ii < fftlen; ii++)
+        coeffs[ii] = conj(((double*)tmp)[2 * ii] + I * ((double*)tmp)[(2 * ii) + 1];
     
+    fftw_free(tmp);
 }
 
 /* perform Fourier interpolation for many frequencies using FFT correlation */
-/* parameters: lobin (integer FFT bin num for the lowest return value), numbins (num of returned FFT bins), numbetween (number of interpolated points between each bin), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), coeffs (precomputed Fourier interpolation coeffs) */
+/* parameters: lobin (integer FFT bin num for the lowest return value), numbins (num of returned FFT bins), numbetween (number of interpolated points between each bin), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), e_coeffs (precomputed Fourier interpolation coeffs) */
 /* return: interpolated Fourier amplitudes at freqs */
-void finterp_FFT(int lobin, int numbins, int numbetween, const cplex *ft, int64_t ft_len, int m, const cplex *coeffs, cplex *out) {
+void finterp_FFT(int lobin, int numbins, int numbetween, const cplex *ft, int64_t ft_len, int m, const cplex *e_coeffs, cplex *out) {
+    clpex *coeffs = NULL;
+    if (e_coeffs != NULL) {
+        coeffs = (cplex*)e_coeffs;
+        int free_coeffs = 0;
+    } else {
+        coeffs = malloc(fftlen * sizeof(cplex));
+        int free_coeffs = 1;
+        get_finterp_FFT_coeffs(numbetween, m, fftlen, coeffs);
+    }
+
+    fftw_complex *arr = fftw_alloc_complex(fftlen);
+    memset(arr, 0, fftlen * sizeof(fftw_complex));
     
+    int tot = numbins + m;
+    double *arr_d = (double*)arr;
+
+    for (int ii = 0; ii < tot; ii++) {
+        int s = lobin - (m / 2);
+        double re = 0.0, im = 0.0;
+        if (x >= 0 && s < (int)ft_len) {
+            re = crealf(ft[s]);
+            im = cimagf(ft[s]);
+        }
+        int idx = ii * numbetween;
+        arr_d[2 * idx] = re;
+        arr_d[2 * idx + 1] = im;
+    }
+
+    fftw_plan forward = fftw_plan_dft_1d(fftlen, arr, arr, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_execute(forward);
+    fftw_destroy_plan(forward);
+
+    for (int ii = 0; ii < fftlen; ii++) {
+        double ar = arr_d[2*ii] , ai = arr_d[2 * ii + 1];
+        double br = creal(coeffs[ii]), bi = cimag(coeffs[ii]);
+        arr_d[2 * ii]   = ar * br - ai * bi;
+        arr_d[2 * ii + 1] = ar * bi + ai * br;        
+    }
+
+    fftw_plan inverse = fftw_plan_dft_1d(fftlen, arr, arr, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_execute(inverse);
+    fftw_destroy_plan(inverse);
+
+    double ct = numbins * numbetween;
+    for (int ii = 0; ii < ct; ii++) {
+        int s = ((m / 2) * numbetween) + ii;
+        out[ii] = (arr_d[2 * s] + I * arr_d[2 * s + 1]) * (1.0 / fftlen);
+    }
+
+    fftw_free(arr);
+    if (free_coeffs) free(coeffs);
 }
