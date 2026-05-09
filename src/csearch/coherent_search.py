@@ -3,8 +3,8 @@ import sys
 import os
 import argparse
 import numpy as np
-import coherent_search.utils as utils
-import coherent_search.fourierinterp_ctypes as fi
+import csearch.utils as utils
+import csearch.fourierinterp_ctypes as fi
 from tqdm import tqdm
 
 

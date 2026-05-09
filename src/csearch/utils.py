@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import fourierinterp_ctypes as fi
+import csearch.fourierinterp_ctypes as fi
 from pathlib import Path
 from typing import Union
 
