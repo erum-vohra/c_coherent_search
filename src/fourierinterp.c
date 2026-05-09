@@ -37,6 +37,8 @@ void get_finterp_coeffs(double dr, int m, cplex *coeffs) {
 }
 
 /* get the Fourier bins around a real-valued Fourier frequency r */
+/* parameters: r (real-valued Fourier frequency), ft (Fourier transform array), ft_len (length of ft), m (number of bins to return) */
+/* return: out (array of complex Fourier amplitudes) */
 void get_nearby_fourier_bins(double r, const cplex_f *ft, int64_t ft_len, int m, cplex *out) {
     assert (m % 2 == 0);
     int r_int = (int)floor(r + 1e-15) + 1;
@@ -52,6 +54,8 @@ void get_nearby_fourier_bins(double r, const cplex_f *ft, int64_t ft_len, int m,
 }
 
 /* perform Fourier interpolation at real-valued Fourier frequency r */
+/* parameters: r (real-valued Fourier frequency), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs) */
+/* return: interpolated Fourier amplitude at frequency r */
 cplex fourier_interp(double r, const cplex_f *ft, int64_t ft_len, int m) {
     assert(r >= 0.0);
     assert(m % 2 == 0);
@@ -73,6 +77,8 @@ cplex fourier_interp(double r, const cplex_f *ft, int64_t ft_len, int m) {
 }
 
 /* compute Fourier interpolation coeffs for multiple real-valued Fourier frequencies */
+/* parameters: rs (real valued Fourier frequencies to interpolate), n_rs (length of rs), m (number of interpolation coeffs) */
+/* return: coeffs (array of Fourier interpolation coefficents) */
 void get_finterp_multi_coeffs(const double *rs, int n_rs, int m, cplex *coeffs) {
     assert(m % 2 == 0);
 
@@ -86,16 +92,22 @@ void get_finterp_multi_coeffs(const double *rs, int n_rs, int m, cplex *coeffs) 
 }
 
 /* perform Fourier interpolation at multiple real-valued Fourier frequencies */
+/* parameters: rs (real valued Fourier frequencies to interpolate), n_rs (length of rs), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), coeffs (precomputed Fourier interpolation coeffs for rs and m) */
+/* return: coeffs (interpolated Fourier amplitudes at frequencies rs) */
 void finterp_multi(const double *rs, int n_rs, const cplex_f *ft, int64_t ft_len, int m, const cplex *coeffs, cpelx *out) {
     
 }
 
 /* compute Fourier interpolation coeffs for FFT correlation method */
+/* parameters: numbetween (number of interpolated points between each FFT bin),  m (number of interpolation coeffs), fftlen (length of FFT to use) */
+/* return: coeffs (FFT's Fourier interpolation coefficents) */
 void get_finterp_FFT_coeffs(int numbetween, int m, int fftlen, cplex *coeffs) {
     
 }
 
 /* perform Fourier interpolation for many frequencies using FFT correlation */
+/* parameters: lobin (integer FFT bin num for the lowest return value), numbins (num of returned FFT bins), numbetween (number of interpolated points between each bin), ft (Fourier transform array), ft_len (length of ft), m (number of interpolation coeffs), coeffs (precomputed Fourier interpolation coeffs) */
+/* return: interpolated Fourier amplitudes at freqs */
 void finterp_FFT(int lobin, int numbins, int numbetween, const cplex *ft, int64_t ft_len, int m, const cplex *coeffs, cplex *out) {
     
 }
